@@ -1,11 +1,12 @@
 import pygame
 
-from settings import *
+from src.settings import TILE_SIZE, PLAYER_COLOR, TARGET_FPS
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, pos, groups, collision_sprites):
-        super().__init__(groups)
+    def __init__(self, pos: tuple[int, int], group: pygame.sprite.Group,
+                 collision_sprites: pygame.sprite.Group):
+        super().__init__(group)
         self.image = pygame.Surface((TILE_SIZE // 2, TILE_SIZE))
         self.image.fill(PLAYER_COLOR)
         self.rect = self.image.get_rect(topleft=pos)
@@ -56,12 +57,12 @@ class Player(pygame.sprite.Sprite):
         if self.on_floor and self.direction.y != 0:
             self.on_floor = False
 
-    def apply_gravity(self, dt):
+    def apply_gravity(self, dt: float):
         self.direction.y += self.gravity * dt
         self.pos.y += self.direction.y * dt * TARGET_FPS
         self.rect.y = round(self.pos.y)
 
-    def update(self, dt):
+    def update(self, dt: float):
         self.input()
         self.pos.x += self.direction.x * self.speed * dt
         self.rect.x = round(self.pos.x)
