@@ -1,3 +1,5 @@
+from pathlib import Path
+
 LEVEL_MAP = [
     '                            ',
     '                            ',
@@ -18,6 +20,8 @@ TARGET_FPS = 60
 TILE_SIZE = 64
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
+
+BASE_DIR = Path().resolve()
 
 # colors 
 BG_COLOR = '#060C17'

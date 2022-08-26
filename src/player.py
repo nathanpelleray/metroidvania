@@ -1,14 +1,28 @@
 import pygame
 
-from src.settings import TILE_SIZE, PLAYER_COLOR, TARGET_FPS
+from src.settings import TILE_SIZE, PLAYER_COLOR, TARGET_FPS, BASE_DIR
+from src.support import import_folder
 
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos: tuple[int, int], group: pygame.sprite.Group,
                  collision_sprites: pygame.sprite.Group):
         super().__init__(group)
-        self.image = pygame.Surface((TILE_SIZE // 2, TILE_SIZE))
-        self.image.fill(PLAYER_COLOR)
+
+        # Animation
+        self.animations = {
+            'right_idle': [], 'left_idle': [],
+            'right_run': [], 'left_run': [],
+            'right_jump': [], 'left_jump': [],
+            'right_fall': [], 'left_fall': []
+        }
+        self.import_assets()
+        self.status = 'right_idle'
+        self.speed_animation = 4
+        self.frame_index = 0
+
+        # Setup
+        self.image = self.animations[self.status][self.frame_index]
         self.rect = self.image.get_rect(topleft=pos)
 
         # player movement
@@ -16,22 +30,48 @@ class Player(pygame.sprite.Sprite):
         self.pos = pygame.math.Vector2(self.rect.topleft)  # Ajout
         self.speed = 8 * TARGET_FPS
         self.gravity = 0.8 * TARGET_FPS
-        self.jump_speed = 16
+        self.jump_speed = 20
         self.collision_sprites = collision_sprites
         self.on_floor = False
+
+    def import_assets(self):
+        for animation in self.animations.keys():
+            full_path = BASE_DIR / "graphics" / animation
+            self.animations[animation] = import_folder(full_path)
+
+    def animate(self, dt: float):
+        self.frame_index += self.speed_animation * dt
+        if self.frame_index >= len(self.animations[self.status]):
+            self.frame_index = 0
+        self.image = self.animations[self.status][int(self.frame_index)]
 
     def input(self):
         keys = pygame.key.get_pressed()
 
         if keys[pygame.K_RIGHT]:
             self.direction.x = 1
+            self.status = 'right'
         elif keys[pygame.K_LEFT]:
             self.direction.x = -1
+            self.status = 'left'
         else:
             self.direction.x = 0
 
         if keys[pygame.K_SPACE] and self.on_floor:
             self.direction.y = -self.jump_speed
+            self.frame_index = 0
+
+    def get_status(self):
+        # idle
+        if self.direction.magnitude() == 0:
+            self.status = self.status.split('_')[0] + '_idle'
+
+        if self.direction.y < 0:
+            self.status = self.status.split('_')[0] + '_jump'
+        elif self.direction.y > 0:
+            self.status = self.status.split('_')[0] + '_fall'
+        if self.direction.x != 0:
+            self.status = self.status.split('_')[0] + '_run'
 
     def horizontal_collisions(self):
         for sprite in self.collision_sprites.sprites():
@@ -62,10 +102,16 @@ class Player(pygame.sprite.Sprite):
         self.pos.y += self.direction.y * dt * TARGET_FPS
         self.rect.y = round(self.pos.y)
 
-    def update(self, dt: float):
-        self.input()
+    def move(self, dt: float):
         self.pos.x += self.direction.x * self.speed * dt
         self.rect.x = round(self.pos.x)
         self.horizontal_collisions()
         self.apply_gravity(dt)
         self.vertical_collisions()
+
+    def update(self, dt: float):
+        self.input()
+        self.get_status()
+
+        self.move(dt)
+        self.animate(dt)
