@@ -40,6 +40,7 @@ class Player(pygame.sprite.Sprite):
             self.animations[animation] = import_folder(full_path)
 
     def animate(self, dt: float):
+        print(int(self.frame_index))
         self.frame_index += self.speed_animation * dt
         if self.frame_index >= len(self.animations[self.status]):
             self.frame_index = 0
@@ -68,7 +69,7 @@ class Player(pygame.sprite.Sprite):
 
         if self.direction.y < 0:
             self.status = self.status.split('_')[0] + '_jump'
-        elif self.direction.y > 0:
+        elif self.direction.y > 1:
             self.status = self.status.split('_')[0] + '_fall'
         else:
             if self.direction.x != 0:
