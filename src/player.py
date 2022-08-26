@@ -70,8 +70,9 @@ class Player(pygame.sprite.Sprite):
             self.status = self.status.split('_')[0] + '_jump'
         elif self.direction.y > 0:
             self.status = self.status.split('_')[0] + '_fall'
-        if self.direction.x != 0:
-            self.status = self.status.split('_')[0] + '_run'
+        else:
+            if self.direction.x != 0:
+                self.status = self.status.split('_')[0] + '_run'
 
     def horizontal_collisions(self):
         for sprite in self.collision_sprites.sprites():
