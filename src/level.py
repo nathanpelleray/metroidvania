@@ -2,8 +2,9 @@ import pygame
 from pytmx import load_pygame
 
 from src.player import Player
-from src.settings import LEVEL_MAP, TILE_SIZE, BG_COLOR, CAMERA_BORDERS
-from src.tile import Tile
+from src.settings import TILE_SIZE, BG_COLOR, CAMERA_BORDERS, BASE_DIR
+from src.support import import_folder
+from src.tile import Tile, AnimatedTile
 
 
 class Level:
@@ -26,6 +27,11 @@ class Level:
         # Terrain
         for x, y, surf in tmx_data.get_layer_by_name('Terrain').tiles():
             Tile((x * TILE_SIZE, y * TILE_SIZE), surf, [self.all_sprites, self.collision_sprites])
+
+        # Water
+        water_frames = import_folder(BASE_DIR / "graphics" / "water")
+        for x, y, surf in tmx_data.get_layer_by_name('Water').tiles():
+            AnimatedTile((x * TILE_SIZE, y * TILE_SIZE), water_frames, [self.all_sprites])
 
         # Player
         for obj in tmx_data.get_layer_by_name('Player'):

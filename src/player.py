@@ -1,6 +1,6 @@
 import pygame
 
-from src.settings import TILE_SIZE, PLAYER_COLOR, TARGET_FPS, BASE_DIR
+from src.settings import TARGET_FPS, BASE_DIR
 from src.support import import_folder
 
 
@@ -40,7 +40,6 @@ class Player(pygame.sprite.Sprite):
             self.animations[animation] = import_folder(full_path)
 
     def animate(self, dt: float):
-        print(int(self.frame_index))
         self.frame_index += self.speed_animation * dt
         if self.frame_index >= len(self.animations[self.status]):
             self.frame_index = 0

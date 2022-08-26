@@ -1,19 +1,5 @@
 from pathlib import Path
 
-LEVEL_MAP = [
-    '                            ',
-    '                            ',
-    '                            ',
-    '       XXXX           XX    ',
-    '   P                        ',
-    'XXXXX         XX         XX ',
-    ' XXXX       XX              ',
-    ' XX    X  XXXX    XX  XX    ',
-    '       X  XXXX    XX  XXX   ',
-    '    XXXX  XXXXXX  XX  XXXX  ',
-    'XXXXXXXX  XXXXXX  XX  XXXX  '
-]
-
 FPS = 60
 TARGET_FPS = 60
 
