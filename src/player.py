@@ -80,6 +80,7 @@ class Player(pygame.sprite.Sprite):
 
         # Dash
         if keys[pygame.K_RCTRL] and self.can_dash:
+            self.direction.y = 0
             self.can_dash = False
             self.timers['dash'].activate()
             self.speed *= 4
