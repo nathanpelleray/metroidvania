@@ -40,6 +40,10 @@ class Player(pygame.sprite.Sprite):
         self.can_double_jump = False
         self.can_dash = True
 
+        # Stats
+        self.max_health = 3
+        self.health = 2
+
         # Timer
         self.timers = {
             'double jump': Timer(500, self.activate_double_jump),

@@ -1,6 +1,7 @@
 import pygame
 from pytmx import load_pygame
 
+from src.UI import UI
 from src.camera import CameraGroup
 from src.enemy import Enemy
 from src.player import Player
@@ -24,6 +25,9 @@ class Level:
 
         # Map
         self.setup()
+
+        # User interface
+        self.ui = UI()
 
     def setup(self):
         tmx_data = load_pygame('data/map_test.tmx')
@@ -53,6 +57,7 @@ class Level:
         # Drawing logic
         self.display_surface.fill(BG_COLOR)
         self.all_sprites.draw(self.player)
+        self.ui.draw(self.player)
 
         # Debug
         if DEBUG:
