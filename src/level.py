@@ -1,8 +1,8 @@
 import pygame
 from pytmx import load_pygame
 
-from src.enemy import Enemy
 from src.camera import CameraGroup
+from src.enemy import Enemy
 from src.player import Player
 from src.settings import TILE_SIZE, BG_COLOR, BASE_DIR, DEBUG, LAYERS
 from src.support import import_folder
@@ -22,6 +22,7 @@ class Level:
         # Player
         self.player = None
 
+        # Map
         self.setup()
 
     def setup(self):
