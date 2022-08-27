@@ -37,10 +37,13 @@ class Player(pygame.sprite.Sprite):
         self.collision_sprites = collision_sprites
         self.on_floor = False
         self.can_double_jump = False
+        self.can_dash = True
 
         # Timer
         self.timers = {
-            'double jump': Timer(500, self.activate_double_jump)
+            'double jump': Timer(500, self.activate_double_jump),
+            'dash': Timer(100, self.stop_dash),
+            'reset dash': Timer(500, self.reset_dash)
         }
 
     def import_assets(self):
@@ -57,6 +60,7 @@ class Player(pygame.sprite.Sprite):
     def input(self):
         keys = pygame.key.get_pressed()
 
+        # Movement
         if keys[pygame.K_RIGHT]:
             self.direction.x = 1
             self.status = 'right'
@@ -66,12 +70,19 @@ class Player(pygame.sprite.Sprite):
         else:
             self.direction.x = 0
 
+        # Jump
         if keys[pygame.K_SPACE] and (self.on_floor or self.can_double_jump):
             if self.on_floor:
                 self.timers['double jump'].activate()
             self.can_double_jump = False
             self.direction.y = -self.jump_speed
             self.frame_index = 0
+
+        # Dash
+        if keys[pygame.K_RCTRL] and self.can_dash:
+            self.can_dash = False
+            self.timers['dash'].activate()
+            self.speed *= 4
 
     def get_status(self):
         # idle
@@ -134,6 +145,13 @@ class Player(pygame.sprite.Sprite):
 
     def activate_double_jump(self):
         self.can_double_jump = True
+
+    def stop_dash(self):
+        self.speed = 8 * TARGET_FPS
+        self.timers['reset dash'].activate()
+
+    def reset_dash(self):
+        self.can_dash = True
 
     def update_timers(self):
         for timer in self.timers.values():  # type: Timer
