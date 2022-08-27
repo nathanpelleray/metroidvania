@@ -1,5 +1,6 @@
 import pygame
 
+from src.particule import ParticuleManager
 from src.settings import TARGET_FPS, BASE_DIR, LAYERS
 from src.support import import_folder
 from src.tile import Tile
@@ -46,6 +47,9 @@ class Player(pygame.sprite.Sprite):
             'reset dash': Timer(500, self.reset_dash)
         }
 
+        # Player particule
+        self.particule_manager = ParticuleManager()
+
     def import_assets(self):
         for animation in self.animations.keys():
             full_path = BASE_DIR / "graphics" / animation
@@ -78,6 +82,7 @@ class Player(pygame.sprite.Sprite):
                 self.can_double_jump = False
                 self.direction.y = -self.jump_speed
                 self.frame_index = 0
+                self.particule_manager.create_particules('before_jump', self.rect.topleft, [self.groups()[0]])
 
             # Dash
             if keys[pygame.K_RCTRL] and self.can_dash:
@@ -116,6 +121,8 @@ class Player(pygame.sprite.Sprite):
                     self.direction.y = 0
                     self.on_floor = True
                     self.can_double_jump = False
+                    if 'fall' in self.status:
+                        self.particule_manager.create_particules('after_jump', self.rect.topleft, [self.groups()[0]])
                 if self.direction.y < 0:
                     self.rect.top = sprite.rect.bottom
                     self.direction.y = 0
