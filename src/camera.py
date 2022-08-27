@@ -1,7 +1,8 @@
 import pygame
 
 from src.player import Player
-from src.settings import CAMERA_BORDERS
+from src.settings import CAMERA_BORDERS, LAYERS
+from src.tile import Tile
 
 
 class CameraGroup(pygame.sprite.Group):
@@ -35,9 +36,11 @@ class CameraGroup(pygame.sprite.Group):
             self.camera_rect.top - CAMERA_BORDERS['top']
         )
 
-        for sprite in self.sprites():
-            offset_pos = sprite.rect.topleft - self.offset
-            self.display_surface.blit(sprite.image, offset_pos)
+        for layer in LAYERS.values():
+            for sprite in self.sprites():  # type: Tile
+                if sprite.z == layer:
+                    offset_pos = sprite.rect.topleft - self.offset
+                    self.display_surface.blit(sprite.image, offset_pos)
 
     def draw_debug(self):
         # camera offset

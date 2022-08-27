@@ -1,6 +1,6 @@
 import pygame
 
-from src.settings import TARGET_FPS, BASE_DIR
+from src.settings import TARGET_FPS, BASE_DIR, LAYERS
 from src.support import import_folder
 
 
@@ -24,6 +24,7 @@ class Player(pygame.sprite.Sprite):
         # Setup
         self.image = self.animations[self.status][self.frame_index]
         self.rect = self.image.get_rect(topleft=pos)
+        self.z = LAYERS['main']
 
         # player movement
         self.direction = pygame.math.Vector2()

@@ -1,24 +1,34 @@
 from pathlib import Path
 
+# Utils
 FPS = 60
 TARGET_FPS = 60
-DEBUG = True
+DEBUG = False
 
+# Screen
 TILE_SIZE = 64
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
 
+# Path file
 BASE_DIR = Path().resolve()
 
-# colors 
+# Colors
 BG_COLOR = '#060C17'
 PLAYER_COLOR = '#C4F7FF'
 TILE_COLOR = '#94D7F2'
 
-# camera
+# Camera
 CAMERA_BORDERS = {
     'left': 100,
     'right': 200,
     'top': 100,
     'bottom': 150
+}
+
+# Layer
+LAYERS = {
+    'terrain': 0,
+    'main': 1,
+    'water': 2
 }
