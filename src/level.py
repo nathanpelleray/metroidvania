@@ -1,7 +1,7 @@
 import pygame
 from pytmx import load_pygame
 
-from src.Enemy import Enemy
+from src.enemy import Enemy
 from src.camera import CameraGroup
 from src.player import Player
 from src.settings import TILE_SIZE, BG_COLOR, BASE_DIR, DEBUG, LAYERS

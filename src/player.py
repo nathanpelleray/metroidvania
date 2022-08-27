@@ -3,6 +3,7 @@ import pygame
 from src.settings import TARGET_FPS, BASE_DIR, LAYERS
 from src.support import import_folder
 from src.tile import Tile
+from src.timer import Timer
 
 
 class Player(pygame.sprite.Sprite):
@@ -35,6 +36,12 @@ class Player(pygame.sprite.Sprite):
         self.jump_speed = 20
         self.collision_sprites = collision_sprites
         self.on_floor = False
+        self.can_double_jump = False
+
+        # Timer
+        self.timers = {
+            'double jump': Timer(500, self.activate_double_jump)
+        }
 
     def import_assets(self):
         for animation in self.animations.keys():
@@ -59,7 +66,10 @@ class Player(pygame.sprite.Sprite):
         else:
             self.direction.x = 0
 
-        if keys[pygame.K_SPACE] and self.on_floor:
+        if keys[pygame.K_SPACE] and (self.on_floor or self.can_double_jump):
+            if self.on_floor:
+                self.timers['double jump'].activate()
+            self.can_double_jump = False
             self.direction.y = -self.jump_speed
             self.frame_index = 0
 
@@ -92,6 +102,7 @@ class Player(pygame.sprite.Sprite):
                     self.rect.bottom = sprite.rect.top
                     self.direction.y = 0
                     self.on_floor = True
+                    self.can_double_jump = False
                 if self.direction.y < 0:
                     self.rect.top = sprite.rect.bottom
                     self.direction.y = 0
@@ -121,9 +132,17 @@ class Player(pygame.sprite.Sprite):
         offset_rect.topleft -= offset
         pygame.draw.rect(display_surface, 'white', offset_rect, 3)
 
+    def activate_double_jump(self):
+        self.can_double_jump = True
+
+    def update_timers(self):
+        for timer in self.timers.values():  # type: Timer
+            timer.update()
+
     def update(self, dt: float):
         self.input()
         self.get_status()
+        self.update_timers()
 
         self.move(dt)
         self.animate(dt)
