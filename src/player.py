@@ -110,6 +110,12 @@ class Player(pygame.sprite.Sprite):
         self.apply_gravity(dt)
         self.vertical_collisions()
 
+    def draw_debug(self, display_surface: pygame.Surface, offset: pygame.math.Vector2):
+        # draw rect
+        offset_rect = self.rect.copy()
+        offset_rect.topleft -= offset
+        pygame.draw.rect(display_surface, 'white', offset_rect, 3)
+
     def update(self, dt: float):
         self.input()
         self.get_status()

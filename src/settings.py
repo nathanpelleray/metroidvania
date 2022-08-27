@@ -2,6 +2,7 @@ from pathlib import Path
 
 FPS = 60
 TARGET_FPS = 60
+DEBUG = True
 
 TILE_SIZE = 64
 SCREEN_WIDTH = 1280

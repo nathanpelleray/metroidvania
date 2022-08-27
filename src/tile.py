@@ -7,6 +7,11 @@ class Tile(pygame.sprite.Sprite):
         self.image = surf
         self.rect = self.image.get_rect(topleft=pos)
 
+    def draw_debug(self, display_surface: pygame.Surface, offset: pygame.math.Vector2):
+        offset_rect = self.rect.copy()
+        offset_rect.center -= offset
+        pygame.draw.rect(display_surface, 'white', offset_rect, 3)
+
 
 class AnimatedTile(Tile):
     def __init__(self, pos: tuple[int, int], frames: list[pygame.Surface],
