@@ -28,7 +28,8 @@ CAMERA_BORDERS = {
 
 # Layer
 LAYERS = {
-    'terrain': 0,
-    'main': 1,
-    'water': 2
+    'invisible': 0,
+    'terrain': 1,
+    'main': 2,
+    'water': 3
 }

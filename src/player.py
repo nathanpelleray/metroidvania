@@ -2,6 +2,7 @@ import pygame
 
 from src.settings import TARGET_FPS, BASE_DIR, LAYERS
 from src.support import import_folder
+from src.tile import Tile
 
 
 class Player(pygame.sprite.Sprite):
@@ -26,9 +27,9 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(topleft=pos)
         self.z = LAYERS['main']
 
-        # player movement
+        # Movement
         self.direction = pygame.math.Vector2()
-        self.pos = pygame.math.Vector2(self.rect.topleft)  # Ajout
+        self.pos = pygame.math.Vector2(self.rect.topleft)
         self.speed = 8 * TARGET_FPS
         self.gravity = 0.8 * TARGET_FPS
         self.jump_speed = 20
@@ -85,7 +86,7 @@ class Player(pygame.sprite.Sprite):
                 self.pos.x = self.rect.x
 
     def vertical_collisions(self):
-        for sprite in self.collision_sprites.sprites():
+        for sprite in self.collision_sprites.sprites():  # type: Tile
             if sprite.rect.colliderect(self.rect):
                 if self.direction.y > 0:
                     self.rect.bottom = sprite.rect.top
@@ -105,9 +106,12 @@ class Player(pygame.sprite.Sprite):
         self.rect.y = round(self.pos.y)
 
     def move(self, dt: float):
+        # Horizontal
         self.pos.x += self.direction.x * self.speed * dt
         self.rect.x = round(self.pos.x)
         self.horizontal_collisions()
+
+        # Vertical
         self.apply_gravity(dt)
         self.vertical_collisions()
 

@@ -1,6 +1,7 @@
 import pygame
 from pytmx import load_pygame
 
+from src.Enemy import Enemy
 from src.camera import CameraGroup
 from src.player import Player
 from src.settings import TILE_SIZE, BG_COLOR, BASE_DIR, DEBUG, LAYERS
@@ -16,6 +17,7 @@ class Level:
         # Groups
         self.all_sprites = CameraGroup()
         self.collision_sprites = pygame.sprite.Group()
+        self.collider_sprites = pygame.sprite.Group()
 
         # Player
         self.player = None
@@ -27,12 +29,19 @@ class Level:
 
         # Terrain
         for x, y, surf in tmx_data.get_layer_by_name('Terrain').tiles():
-            Tile((x * TILE_SIZE, y * TILE_SIZE), surf, [self.all_sprites, self.collision_sprites], LAYERS['terrain'])
+            Tile((x * TILE_SIZE, y * TILE_SIZE), [self.all_sprites, self.collision_sprites], surf, LAYERS['terrain'])
 
         # Water
         water_frames = import_folder(BASE_DIR / "graphics" / "water")
         for x, y, surf in tmx_data.get_layer_by_name('Water').tiles():
             AnimatedTile((x * TILE_SIZE, y * TILE_SIZE), water_frames, [self.all_sprites], z=LAYERS['water'])
+
+        # Enemies
+        for obj in tmx_data.get_layer_by_name('Enemies'):
+            if obj.name == 'Collider':
+                Tile((obj.x, obj.y), [self.collider_sprites], z=LAYERS['invisible'])
+            if obj.type == 'Enemy':
+                Enemy(obj.name, (obj.x, obj.y), [self.all_sprites], self.collider_sprites)
 
         # Player
         for obj in tmx_data.get_layer_by_name('Player'):

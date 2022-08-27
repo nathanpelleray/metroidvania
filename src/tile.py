@@ -1,10 +1,12 @@
 import pygame
 
-from src.settings import LAYERS
+from src.settings import LAYERS, TILE_SIZE
 
 
 class Tile(pygame.sprite.Sprite):
-    def __init__(self, pos: tuple[int, int], surf: pygame.Surface, groups: list[pygame.sprite.AbstractGroup],
+    def __init__(self, pos: tuple[int, int],
+                 groups: list[pygame.sprite.AbstractGroup],
+                 surf: pygame.Surface = pygame.Surface((TILE_SIZE, TILE_SIZE)),
                  z: int = LAYERS['main']):
         # Setup
         super().__init__(groups)
