@@ -60,30 +60,31 @@ class Player(pygame.sprite.Sprite):
     def input(self):
         keys = pygame.key.get_pressed()
 
-        # Movement
-        if keys[pygame.K_RIGHT]:
-            self.direction.x = 1
-            self.status = 'right'
-        elif keys[pygame.K_LEFT]:
-            self.direction.x = -1
-            self.status = 'left'
-        else:
-            self.direction.x = 0
+        if not self.timers['dash'].active:
+            # Movement
+            if keys[pygame.K_RIGHT]:
+                self.direction.x = 1
+                self.status = 'right'
+            elif keys[pygame.K_LEFT]:
+                self.direction.x = -1
+                self.status = 'left'
+            else:
+                self.direction.x = 0
 
-        # Jump
-        if keys[pygame.K_SPACE] and (self.on_floor or self.can_double_jump):
-            if self.on_floor:
-                self.timers['double jump'].activate()
-            self.can_double_jump = False
-            self.direction.y = -self.jump_speed
-            self.frame_index = 0
+            # Jump
+            if keys[pygame.K_SPACE] and (self.on_floor or self.can_double_jump):
+                if self.on_floor:
+                    self.timers['double jump'].activate()
+                self.can_double_jump = False
+                self.direction.y = -self.jump_speed
+                self.frame_index = 0
 
-        # Dash
-        if keys[pygame.K_RCTRL] and self.can_dash:
-            self.direction.y = 0
-            self.can_dash = False
-            self.timers['dash'].activate()
-            self.speed *= 4
+            # Dash
+            if keys[pygame.K_RCTRL] and self.can_dash:
+                self.direction.y = 0
+                self.can_dash = False
+                self.timers['dash'].activate()
+                self.speed *= 4
 
     def get_status(self):
         # idle
