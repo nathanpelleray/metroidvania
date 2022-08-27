@@ -3,7 +3,7 @@ import sys
 import pygame
 
 from src.level import Level
-from src.settings import SCREEN_WIDTH, SCREEN_HEIGHT, FPS
+from src.settings import SCREEN_WIDTH, SCREEN_HEIGHT, FPS, FULLSCREEN
 
 
 class Game:
@@ -11,6 +11,8 @@ class Game:
         # Pygame setup
         pygame.init()
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+        if FULLSCREEN:
+            self.screen = pygame.display.set_mode((self.screen.get_width(), self.screen.get_height()), pygame.FULLSCREEN)
         pygame.display.set_caption('Platformer')
         self.clock = pygame.time.Clock()
 

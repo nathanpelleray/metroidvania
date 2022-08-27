@@ -9,6 +9,7 @@ DEBUG = False
 TILE_SIZE = 64
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
+FULLSCREEN = False
 
 # Path file
 BASE_DIR = Path().resolve()
