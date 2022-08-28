@@ -2,7 +2,7 @@ import pygame
 
 from src.particule import ParticuleManager
 from src.settings import TARGET_FPS, BASE_DIR, LAYERS
-from src.support import import_folder
+from src.support import import_folder, wave_value
 from src.tile import Tile
 from src.timer import Timer
 
@@ -69,6 +69,13 @@ class Player(pygame.sprite.Sprite):
         if self.frame_index >= len(self.animations[self.status]):
             self.frame_index = 0
         self.image = self.animations[self.status][int(self.frame_index)]
+
+        # hit
+        if not self.vulnerable and not self.timers['dash'].active:
+            alpha = wave_value()
+            self.image.set_alpha(alpha)
+        else:
+            self.image.set_alpha(255)
 
     def input(self):
         keys = pygame.key.get_pressed()

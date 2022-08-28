@@ -1,3 +1,4 @@
+from math import sin
 from os import walk
 from pathlib import Path
 
@@ -14,3 +15,11 @@ def import_folder(path: Path) -> list[pygame.Surface]:
             surface_list.append(image_surf)
 
     return surface_list
+
+
+def wave_value():
+    value = sin(pygame.time.get_ticks())
+    if value >= 0:
+        return 255
+    else:
+        return 0
