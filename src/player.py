@@ -9,7 +9,7 @@ from src.timer import Timer
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos: tuple[int, int], group: pygame.sprite.Group,
-                 collision_sprites: pygame.sprite.Group):
+                 collision_sprites: pygame.sprite.Group, enemy_sprites: pygame.sprite.Group):
         super().__init__(group)
 
         # Animation
@@ -42,21 +42,26 @@ class Player(pygame.sprite.Sprite):
 
         # Stats
         self.max_health = 3
-        self.health = 2
+        self.health = self.max_health
+
+        # Interaction
+        self.enemy_sprites = enemy_sprites
+        self.vulnerable = True
 
         # Timer
         self.timers = {
             'double jump': Timer(500, self.activate_double_jump),
             'dash': Timer(100, self.stop_dash),
-            'reset dash': Timer(500, self.reset_dash)
+            'reset dash': Timer(500, self.reset_dash),
+            'invulnerability': Timer(500, self.reset_vulnerability)
         }
 
-        # Player particule
+        # Player particuleenemy_sprites
         self.particule_manager = ParticuleManager()
 
     def import_assets(self):
         for animation in self.animations.keys():
-            full_path = BASE_DIR / "graphics" / animation
+            full_path = BASE_DIR / "graphics" / "player" / animation
             self.animations[animation] = import_folder(full_path)
 
     def animate(self, dt: float):
@@ -166,14 +171,27 @@ class Player(pygame.sprite.Sprite):
     def reset_dash(self):
         self.can_dash = True
 
+    def reset_vulnerability(self):
+        self.vulnerable = True
+
     def update_timers(self):
         for timer in self.timers.values():  # type: Timer
             timer.update()
+
+    def interaction_enemy(self):
+        if self.vulnerable:
+            collision_sprites = pygame.sprite.spritecollide(self, self.enemy_sprites, False)
+            if collision_sprites:
+                for _ in collision_sprites:
+                    self.health -= 1
+                    self.vulnerable = False
+                    self.timers['invulnerability'].activate()
 
     def update(self, dt: float):
         self.input()
         self.get_status()
         self.update_timers()
+        self.interaction_enemy()
 
         self.move(dt)
         self.animate(dt)

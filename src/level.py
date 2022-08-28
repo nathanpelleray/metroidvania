@@ -19,6 +19,7 @@ class Level:
         self.all_sprites = CameraGroup()
         self.collision_sprites = pygame.sprite.Group()
         self.collider_sprites = pygame.sprite.Group()
+        self.enemy_sprites = pygame.sprite.Group()
 
         # Player
         self.player = None
@@ -46,12 +47,12 @@ class Level:
             if obj.name == 'Collider':
                 Tile((obj.x, obj.y), [self.collider_sprites], z=LAYERS['invisible'])
             if obj.type == 'Enemy':
-                Enemy(obj.name, (obj.x, obj.y), [self.all_sprites], self.collider_sprites)
+                Enemy(obj.name, (obj.x, obj.y), [self.all_sprites, self.enemy_sprites], self.collider_sprites)
 
         # Player
         for obj in tmx_data.get_layer_by_name('Player'):
             if obj.name == 'Start':
-                self.player = Player((obj.x, obj.y), self.all_sprites, self.collision_sprites)
+                self.player = Player((obj.x, obj.y), self.all_sprites, self.collision_sprites, self.enemy_sprites)
 
     def run(self, dt: float):
         # Drawing logic
