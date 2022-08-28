@@ -98,6 +98,7 @@ class Player(pygame.sprite.Sprite):
                 self.direction.y = 0
                 self.can_dash = False
                 self.timers['dash'].activate()
+                self.vulnerable = False
                 self.speed *= 4
 
     def get_status(self):
@@ -167,6 +168,7 @@ class Player(pygame.sprite.Sprite):
     def stop_dash(self):
         self.speed = 8 * TARGET_FPS
         self.timers['reset dash'].activate()
+        self.vulnerable = True
 
     def reset_dash(self):
         self.can_dash = True
