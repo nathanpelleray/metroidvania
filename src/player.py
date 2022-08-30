@@ -17,7 +17,8 @@ class Player(pygame.sprite.Sprite):
             'right_idle': [], 'left_idle': [],
             'right_run': [], 'left_run': [],
             'right_jump': [], 'left_jump': [],
-            'right_fall': [], 'left_fall': []
+            'right_fall': [], 'left_fall': [],
+            'right_attack': [], 'left_attack': []
         }
         self.import_assets()
         self.status = 'right_idle'
@@ -39,6 +40,7 @@ class Player(pygame.sprite.Sprite):
         self.on_floor = False
         self.can_double_jump = False
         self.can_dash = True
+        self.can_attack = True
 
         # Stats
         self.max_health = 3
@@ -52,7 +54,9 @@ class Player(pygame.sprite.Sprite):
             'double jump': Timer(500, self.activate_double_jump),
             'dash': Timer(100, self.stop_dash),
             'reset dash': Timer(500, self.reset_dash),
-            'invulnerability': Timer(500, self.reset_vulnerability)
+            'invulnerability': Timer(500, self.reset_vulnerability),
+            'attacking': Timer(300, self.stop_attack),
+            'reset attack': Timer(500, self.reset_attack)
         }
 
         # Player particule
@@ -79,7 +83,7 @@ class Player(pygame.sprite.Sprite):
     def input(self):
         keys = pygame.key.get_pressed()
 
-        if not self.timers['dash'].active:
+        if not self.timers['dash'].active and not self.timers['attacking'].active:
             # Movement
             if keys[pygame.K_RIGHT]:
                 self.direction.x = 1
@@ -89,6 +93,14 @@ class Player(pygame.sprite.Sprite):
                 self.status = 'left'
             else:
                 self.direction.x = 0
+
+            # Attack
+            if keys[pygame.K_q] and self.can_attack:
+                self.timers['attacking'].activate()
+                self.speed_animation = 4 * 3
+                self.frame_index = 0
+                self.can_attack = False
+                self.direction = pygame.math.Vector2()
 
             # Jump
             if keys[pygame.K_SPACE] and (self.on_floor or self.can_double_jump):
@@ -112,6 +124,7 @@ class Player(pygame.sprite.Sprite):
         if self.direction.magnitude() == 0:
             self.status = self.status.split('_')[0] + '_idle'
 
+        # Movement
         if self.direction.y < 0:
             self.status = self.status.split('_')[0] + '_jump'
         elif self.direction.y > 1:
@@ -119,6 +132,10 @@ class Player(pygame.sprite.Sprite):
         else:
             if self.direction.x != 0:
                 self.status = self.status.split('_')[0] + '_run'
+
+        # Attacking
+        if self.timers['attacking'].active:
+            self.status = self.status.split('_')[0] + '_attack'
 
     def horizontal_collisions(self):
         for sprite in self.collision_sprites.sprites():
@@ -181,6 +198,14 @@ class Player(pygame.sprite.Sprite):
 
     def reset_vulnerability(self):
         self.vulnerable = True
+
+    def stop_attack(self):
+        self.timers['reset attack'].activate()
+        self.speed_animation = 4
+        print(self.frame_index)
+
+    def reset_attack(self):
+        self.can_attack = True
 
     def update_timers(self):
         for timer in self.timers.values():  # type: Timer
