@@ -1,3 +1,5 @@
+from random import randint
+
 import pygame
 
 from src.player import Player
@@ -19,7 +21,7 @@ class CameraGroup(pygame.sprite.Group):
 
         self.camera_rect = pygame.Rect(cam_left, cam_top, cam_width, cam_height)
 
-    def draw(self, player: Player):
+    def custom_draw(self, player: Player, screen_shake: bool):
         # getting the camera position
         if player.rect.left < self.camera_rect.left:
             self.camera_rect.left = player.rect.left
@@ -30,16 +32,23 @@ class CameraGroup(pygame.sprite.Group):
         if player.rect.bottom > self.camera_rect.bottom:
             self.camera_rect.bottom = player.rect.bottom
 
-        # camera offset
+        # Camera offset
         self.offset = pygame.math.Vector2(
             self.camera_rect.left - CAMERA_BORDERS['left'],
             self.camera_rect.top - CAMERA_BORDERS['top']
         )
 
+        # Screen shake
+        offset_screen_shake = pygame.math.Vector2()
+        if screen_shake:
+            offset_screen_shake.x = randint(-4, 4)
+            offset_screen_shake.y = randint(-4, 4)
+
+        # Draw sprites
         for layer in LAYERS.values():
             for sprite in self.sprites():  # type: Tile
                 if sprite.z == layer:
-                    offset_pos = sprite.rect.topleft - self.offset
+                    offset_pos = sprite.rect.topleft - self.offset + offset_screen_shake
                     self.display_surface.blit(sprite.image, offset_pos)
 
     def draw_debug(self):

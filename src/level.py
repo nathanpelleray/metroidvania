@@ -8,6 +8,7 @@ from src.player import Player
 from src.settings import TILE_SIZE, BG_COLOR, BASE_DIR, DEBUG, LAYERS
 from src.support import import_folder
 from src.tile import Tile, AnimatedTile
+from src.timer import Timer
 
 
 class Level:
@@ -20,6 +21,14 @@ class Level:
         self.collision_sprites = pygame.sprite.Group()
         self.collider_sprites = pygame.sprite.Group()
         self.enemy_sprites = pygame.sprite.Group()
+
+        # Timers
+        self.timers = {
+            'screen shake': Timer(300, self.stop_screen_shake)
+        }
+
+        # Screen Shake
+        self.screen_shake = False
 
         # Player
         self.player = None
@@ -52,12 +61,30 @@ class Level:
         # Player
         for obj in tmx_data.get_layer_by_name('Player'):
             if obj.name == 'Start':
-                self.player = Player((obj.x, obj.y), self.all_sprites, self.collision_sprites, self.enemy_sprites)
+                self.player = Player((obj.x, obj.y), self.all_sprites, self.collision_sprites)
+
+    def damage_player(self):
+        if self.player.vulnerable:
+            collision_sprites = pygame.sprite.spritecollide(self.player, self.enemy_sprites, False)
+            if collision_sprites:
+                for _ in collision_sprites:
+                    self.player.health -= 1
+                    self.player.vulnerable = False
+                    self.player.timers['invulnerability'].activate()
+                    self.screen_shake = True
+                    self.timers['screen shake'].activate()
+
+    def stop_screen_shake(self):
+        self.screen_shake = False
+
+    def update_timers(self):
+        for timer in self.timers.values():  # type: Timer
+            timer.update()
 
     def run(self, dt: float):
         # Drawing logic
         self.display_surface.fill(BG_COLOR)
-        self.all_sprites.draw(self.player)
+        self.all_sprites.custom_draw(self.player, self.screen_shake)
         self.ui.draw(self.player)
 
         # Debug
@@ -66,3 +93,5 @@ class Level:
 
         # Update logic
         self.all_sprites.update(dt)
+        self.update_timers()
+        self.damage_player()
