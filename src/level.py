@@ -9,6 +9,7 @@ from src.settings import TILE_SIZE, BG_COLOR, BASE_DIR, DEBUG, LAYERS
 from src.support import import_folder
 from src.tile import Tile, AnimatedTile
 from src.timer import Timer
+from src.weapon import Weapon
 
 
 class Level:
@@ -21,6 +22,7 @@ class Level:
         self.collision_sprites = pygame.sprite.Group()
         self.collider_sprites = pygame.sprite.Group()
         self.enemy_sprites = pygame.sprite.Group()
+        self.current_attack = None
 
         # Timers
         self.timers = {
@@ -61,7 +63,16 @@ class Level:
         # Player
         for obj in tmx_data.get_layer_by_name('Player'):
             if obj.name == 'Start':
-                self.player = Player((obj.x, obj.y), self.all_sprites, self.collision_sprites)
+                self.player = Player((obj.x, obj.y), self.all_sprites, self.collision_sprites, self.create_attack,
+                                     self.destroy_attack)
+
+    def create_attack(self):
+        self.current_attack = Weapon(self.player, [self.all_sprites])
+
+    def destroy_attack(self):
+        if self.current_attack:
+            self.current_attack.kill()
+        self.current_attack = None
 
     def damage_player(self):
         if self.player.vulnerable:

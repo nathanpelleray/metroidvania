@@ -9,7 +9,7 @@ from src.timer import Timer
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos: tuple[int, int], group: pygame.sprite.Group,
-                 collision_sprites: pygame.sprite.Group):
+                 collision_sprites: pygame.sprite.Group, create_attack, destroy_attack):
         super().__init__(group)
 
         # Animation
@@ -48,6 +48,8 @@ class Player(pygame.sprite.Sprite):
 
         # Interaction
         self.vulnerable = True
+        self.create_attack = create_attack
+        self.destroy_attack = destroy_attack
 
         # Timer
         self.timers = {
@@ -101,6 +103,7 @@ class Player(pygame.sprite.Sprite):
                 self.frame_index = 0
                 self.can_attack = False
                 self.direction = pygame.math.Vector2()
+                self.create_attack()
 
             # Jump
             if keys[pygame.K_SPACE] and (self.on_floor or self.can_double_jump):
@@ -202,7 +205,7 @@ class Player(pygame.sprite.Sprite):
     def stop_attack(self):
         self.timers['reset attack'].activate()
         self.speed_animation = 4
-        print(self.frame_index)
+        self.destroy_attack()
 
     def reset_attack(self):
         self.can_attack = True
