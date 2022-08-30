@@ -45,6 +45,7 @@ class Player(pygame.sprite.Sprite):
         # Stats
         self.max_health = 3
         self.health = self.max_health
+        self.damage = 10
 
         # Interaction
         self.vulnerable = True

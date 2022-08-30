@@ -30,5 +30,11 @@ class Weapon(pygame.sprite.Sprite):
             self.frame_index = 0
         self.image = self.frames[int(self.frame_index)]
 
+    def draw_debug(self, display_surface: pygame.Surface, offset: pygame.math.Vector2):
+        # draw rect
+        offset_rect = self.rect.copy()
+        offset_rect.topleft -= offset
+        pygame.draw.rect(display_surface, 'white', offset_rect, 3)
+
     def update(self, dt: float):
         self.animate(dt)

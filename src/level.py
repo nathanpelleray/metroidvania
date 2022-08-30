@@ -74,6 +74,13 @@ class Level:
             self.current_attack.kill()
         self.current_attack = None
 
+    def player_attack_logic(self):
+        if self.current_attack:
+            collision_sprites = pygame.sprite.spritecollide(self.current_attack, self.enemy_sprites, False)
+            if collision_sprites:
+                for target_sprite in collision_sprites: # type: Enemy
+                    target_sprite.get_damage(self.player)
+
     def damage_player(self):
         if self.player.vulnerable:
             collision_sprites = pygame.sprite.spritecollide(self.player, self.enemy_sprites, False)
@@ -106,3 +113,4 @@ class Level:
         self.all_sprites.update(dt)
         self.update_timers()
         self.damage_player()
+        self.player_attack_logic()
