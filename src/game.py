@@ -1,5 +1,4 @@
 import sys
-import time
 
 import pygame
 
@@ -13,7 +12,8 @@ class Game:
         pygame.init()
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         if FULLSCREEN:
-            self.screen = pygame.display.set_mode((self.screen.get_width(), self.screen.get_height()), pygame.FULLSCREEN)
+            self.screen = pygame.display.set_mode((self.screen.get_width(), self.screen.get_height()),
+                                                  pygame.FULLSCREEN)
         pygame.display.set_caption('Platformer')
         self.clock = pygame.time.Clock()
 

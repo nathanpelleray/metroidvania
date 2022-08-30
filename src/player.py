@@ -24,6 +24,7 @@ class Player(pygame.sprite.Sprite):
         self.status = 'right_idle'
         self.speed_animation = 4
         self.frame_index = 0
+        self.alpha = 255
 
         # Setup
         self.image = self.animations[self.status][self.frame_index]
@@ -81,7 +82,7 @@ class Player(pygame.sprite.Sprite):
             alpha = wave_value()
             self.image.set_alpha(alpha)
         else:
-            self.image.set_alpha(255)
+            self.image.set_alpha(self.alpha)
 
     def input(self):
         keys = pygame.key.get_pressed()

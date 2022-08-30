@@ -33,5 +33,5 @@ LAYERS = {
     'water background': 1,
     'terrain': 2,
     'main': 3,
-    'water': 4
+    'water': 4,
 }

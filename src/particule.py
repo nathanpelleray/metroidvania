@@ -9,7 +9,8 @@ class ParticuleManager:
         self.frames = {
             'before_jump': import_folder(BASE_DIR / "graphics" / "particules" / "before_jump"),
             'after_jump': import_folder(BASE_DIR / "graphics" / "particules" / "after_jump"),
-            'mushroom_death': import_folder(BASE_DIR / "graphics" / "enemies" / "mushroom" / "death")
+            'mushroom_death': import_folder(BASE_DIR / "graphics" / "enemies" / "mushroom" / "death"),
+            'player_death': import_folder(BASE_DIR / "graphics" / "player" / "death")
         }
 
     def create_particules(self, animation_type: str, pos: tuple[int, int], group: pygame.sprite.Group):

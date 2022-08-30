@@ -10,6 +10,7 @@ from src.settings import TILE_SIZE, BG_COLOR, BASE_DIR, DEBUG, LAYERS
 from src.support import import_folder
 from src.tile import Tile, AnimatedTile
 from src.timer import Timer
+from src.transition import Transition
 from src.weapon import Weapon
 
 
@@ -23,11 +24,14 @@ class Level:
         self.collision_sprites = pygame.sprite.Group()
         self.collider_sprites = pygame.sprite.Group()
         self.enemy_sprites = pygame.sprite.Group()
+        self.checkpoint_sprites = pygame.sprite.Group()
+        self.last_checkpoint = None
         self.current_attack = None
 
         # Timers
         self.timers = {
-            'screen shake': Timer(300, self.stop_screen_shake)
+            'screen shake': Timer(300, self.stop_screen_shake),
+            'player death': Timer(1500, self.death_animation)
         }
 
         # Screen Shake
@@ -35,6 +39,7 @@ class Level:
 
         # Player
         self.player = None
+        self.respawn = False
 
         # Map
         self.setup()
@@ -44,6 +49,9 @@ class Level:
 
         # Particules
         self.particule_manager = ParticuleManager()
+
+        # Transition
+        self.transition = Transition(self.reset_player, self.stop_respawn)
 
     def setup(self):
         tmx_data = load_pygame('data/map_test.tmx')
@@ -67,6 +75,8 @@ class Level:
 
         # Player
         for obj in tmx_data.get_layer_by_name('Player'):
+            if obj.name == 'Checkpoint':
+                Tile((obj.x, obj.y), [self.checkpoint_sprites])
             if obj.name == 'Start':
                 self.player = Player((obj.x, obj.y), self.all_sprites, self.collision_sprites, self.create_attack,
                                      self.destroy_attack, self.create_particules)
@@ -97,6 +107,30 @@ class Level:
                     self.screen_shake = True
                     self.timers['screen shake'].activate()
 
+                    if self.player.health <= 0:
+                        self.particule_manager.create_particules('player_death', self.player.rect.topleft,
+                                                                 self.all_sprites)
+                        self.player.kill()
+                        self.timers['player death'].activate()
+
+    def reset_player(self):
+        x = self.last_checkpoint.rect.x
+        y = self.last_checkpoint.rect.y
+        self.player = Player((x, y), self.all_sprites, self.collision_sprites, self.create_attack,
+                             self.destroy_attack, self.create_particules)
+
+    def stop_respawn(self):
+        self.respawn = False
+
+    def death_animation(self):
+        self.respawn = True
+
+    def checkpoint_collision(self):
+        collision_sprites = pygame.sprite.spritecollide(self.player, self.checkpoint_sprites, False)
+        if collision_sprites:
+            for checkpoint in collision_sprites:  # type: Tile
+                self.last_checkpoint = checkpoint
+
     def create_particules(self, animation_type: str, pos: tuple[int, int]):
         self.particule_manager.create_particules(animation_type, pos, self.all_sprites)
 
@@ -122,3 +156,7 @@ class Level:
         self.update_timers()
         self.damage_player()
         self.player_attack_logic()
+        self.checkpoint_collision()
+
+        if self.respawn:
+            self.transition.play(dt)
