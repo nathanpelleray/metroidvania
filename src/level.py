@@ -49,7 +49,7 @@ class Level:
         # Water
         water_frames = import_folder(BASE_DIR / "graphics" / "water")
         for x, y, surf in tmx_data.get_layer_by_name('Water').tiles():
-            AnimatedTile((x * TILE_SIZE, y * TILE_SIZE), water_frames, [self.all_sprites], z=LAYERS['water'])
+            AnimatedTile((x * TILE_SIZE, y * TILE_SIZE), water_frames, [self.all_sprites], z=LAYERS['water'], alpha=150)
 
         # Enemies
         for obj in tmx_data.get_layer_by_name('Enemies'):

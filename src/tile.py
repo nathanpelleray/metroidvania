@@ -7,10 +7,12 @@ class Tile(pygame.sprite.Sprite):
     def __init__(self, pos: tuple[int, int],
                  groups: list[pygame.sprite.AbstractGroup],
                  surf: pygame.Surface = pygame.Surface((TILE_SIZE, TILE_SIZE)),
-                 z: int = LAYERS['main']):
+                 z: int = LAYERS['main'],
+                 alpha: int = 255):
         # Setup
         super().__init__(groups)
         self.image = surf
+        self.image.set_alpha(alpha)
         self.rect = self.image.get_rect(topleft=pos)
         self.z = z
 
@@ -22,7 +24,8 @@ class Tile(pygame.sprite.Sprite):
 
 class AnimatedTile(Tile):
     def __init__(self, pos: tuple[int, int], frames: list[pygame.Surface],
-                 groups: list[pygame.sprite.AbstractGroup], speed_animation: int = 5, z: int = LAYERS['main']):
+                 groups: list[pygame.sprite.AbstractGroup], speed_animation: int = 5, z: int = LAYERS['main'],
+                 alpha: int = 255):
         # Animation
         self.frames = frames
         self.frame_index = 0
@@ -35,12 +38,14 @@ class AnimatedTile(Tile):
             groups=groups,
             z=z
         )
+        self.alpha = alpha
 
     def animate(self, dt: float):
         self.frame_index += self.speed_animation * dt
         if self.frame_index >= len(self.frames):
             self.frame_index = 0
         self.image = self.frames[int(self.frame_index)]
+        self.image.set_alpha(self.alpha)
 
     def update(self, dt: float):
         self.animate(dt)
