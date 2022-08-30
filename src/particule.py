@@ -12,14 +12,14 @@ class ParticuleManager:
             'mushroom_death': import_folder(BASE_DIR / "graphics" / "enemies" / "mushroom" / "death")
         }
 
-    def create_particules(self, animation_type: str, pos: tuple[int, int], groups: list[pygame.sprite.Group]):
+    def create_particules(self, animation_type: str, pos: tuple[int, int], group: pygame.sprite.Group):
         animation_frames = self.frames[animation_type]
-        ParticuleEffect(pos, animation_frames, groups)
+        ParticuleEffect(pos, animation_frames, group)
 
 
 class ParticuleEffect(pygame.sprite.Sprite):
-    def __init__(self, pos: tuple[int, int], animation_frames: list[pygame.Surface], groups: list[pygame.sprite.Group]):
-        super().__init__(groups)
+    def __init__(self, pos: tuple[int, int], animation_frames: list[pygame.Surface], group: pygame.sprite.Group):
+        super().__init__(group)
 
         # Animation
         self.frames = animation_frames
@@ -40,4 +40,3 @@ class ParticuleEffect(pygame.sprite.Sprite):
 
     def update(self, dt: float):
         self.animate(dt)
-

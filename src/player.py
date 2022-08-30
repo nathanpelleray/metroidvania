@@ -9,7 +9,7 @@ from src.timer import Timer
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos: tuple[int, int], group: pygame.sprite.Group,
-                 collision_sprites: pygame.sprite.Group, create_attack, destroy_attack):
+                 collision_sprites: pygame.sprite.Group, create_attack, destroy_attack, create_particules):
         super().__init__(group)
 
         # Animation
@@ -63,7 +63,7 @@ class Player(pygame.sprite.Sprite):
         }
 
         # Player particule
-        self.particule_manager = ParticuleManager()
+        self.create_particules = create_particules
 
     def import_assets(self):
         for animation in self.animations.keys():
@@ -113,7 +113,7 @@ class Player(pygame.sprite.Sprite):
                 self.can_double_jump = False
                 self.direction.y = -self.jump_speed
                 self.frame_index = 0
-                self.particule_manager.create_particules('before_jump', self.rect.topleft, [self.groups()[0]])
+                self.create_particules('before_jump', self.rect.topleft)
 
             # Dash
             if keys[pygame.K_RCTRL] and self.can_dash:
@@ -159,7 +159,7 @@ class Player(pygame.sprite.Sprite):
                     self.on_floor = True
                     self.can_double_jump = False
                     if 'fall' in self.status:
-                        self.particule_manager.create_particules('after_jump', self.rect.topleft, [self.groups()[0]])
+                        self.create_particules('after_jump', self.rect.topleft)
                 if self.direction.y < 0:
                     self.rect.top = sprite.rect.bottom
                     self.direction.y = 0

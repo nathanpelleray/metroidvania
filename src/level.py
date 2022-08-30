@@ -4,6 +4,7 @@ from pytmx import load_pygame
 from src.UI import UI
 from src.camera import CameraGroup
 from src.enemy import Enemy
+from src.particule import ParticuleManager
 from src.player import Player
 from src.settings import TILE_SIZE, BG_COLOR, BASE_DIR, DEBUG, LAYERS
 from src.support import import_folder
@@ -41,6 +42,9 @@ class Level:
         # User interface
         self.ui = UI()
 
+        # Particules
+        self.particule_manager = ParticuleManager()
+
     def setup(self):
         tmx_data = load_pygame('data/map_test.tmx')
 
@@ -58,13 +62,14 @@ class Level:
             if obj.name == 'Collider':
                 Tile((obj.x, obj.y), [self.collider_sprites], z=LAYERS['invisible'])
             if obj.type == 'Enemy':
-                Enemy(obj.name, (obj.x, obj.y), [self.all_sprites, self.enemy_sprites], self.collider_sprites)
+                Enemy(obj.name, (obj.x, obj.y), [self.all_sprites, self.enemy_sprites], self.collider_sprites,
+                      self.create_particules)
 
         # Player
         for obj in tmx_data.get_layer_by_name('Player'):
             if obj.name == 'Start':
                 self.player = Player((obj.x, obj.y), self.all_sprites, self.collision_sprites, self.create_attack,
-                                     self.destroy_attack)
+                                     self.destroy_attack, self.create_particules)
 
     def create_attack(self):
         self.current_attack = Weapon(self.player, [self.all_sprites])
@@ -78,7 +83,7 @@ class Level:
         if self.current_attack:
             collision_sprites = pygame.sprite.spritecollide(self.current_attack, self.enemy_sprites, False)
             if collision_sprites:
-                for target_sprite in collision_sprites: # type: Enemy
+                for target_sprite in collision_sprites:  # type: Enemy
                     target_sprite.get_damage(self.player)
 
     def damage_player(self):
@@ -91,6 +96,9 @@ class Level:
                     self.player.timers['invulnerability'].activate()
                     self.screen_shake = True
                     self.timers['screen shake'].activate()
+
+    def create_particules(self, animation_type: str, pos: tuple[int, int]):
+        self.particule_manager.create_particules(animation_type, pos, self.all_sprites)
 
     def stop_screen_shake(self):
         self.screen_shake = False

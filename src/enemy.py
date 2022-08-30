@@ -2,7 +2,6 @@ from random import randint
 
 import pygame
 
-from src.particule import ParticuleManager
 from src.player import Player
 from src.settings import BASE_DIR, LAYERS, TARGET_FPS
 from src.support import import_folder, wave_value
@@ -11,7 +10,7 @@ from src.timer import Timer
 
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, monster_name: str, pos: tuple[int, int], groups: list[pygame.sprite.Group],
-                 collider_sprites: pygame.sprite.Group):
+                 collider_sprites: pygame.sprite.Group, create_particules):
         super().__init__(groups)
         self.monster_name = monster_name
 
@@ -46,7 +45,7 @@ class Enemy(pygame.sprite.Sprite):
         self.collider_sprites = collider_sprites
 
         # Player particule
-        self.particule_manager = ParticuleManager()
+        self.create_particules = create_particules
 
     def import_assets(self, name: str):
         path = BASE_DIR / "graphics" / "enemies" / name
@@ -91,8 +90,7 @@ class Enemy(pygame.sprite.Sprite):
 
     def check_death(self):
         if self.health <= 0:
-            self.particule_manager.create_particules(f'{self.monster_name}_death', self.rect.topleft,
-                                                     [self.groups()[0]])
+            self.create_particules(f'{self.monster_name}_death', self.rect.topleft)
             self.kill()
 
     def draw_debug(self, display_surface: pygame.Surface, offset: pygame.math.Vector2):
