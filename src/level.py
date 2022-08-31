@@ -9,7 +9,7 @@ from src.particule import ParticuleManager
 from src.player import Player
 from src.settings import TILE_SIZE, BG_COLOR, BASE_DIR, DEBUG, LAYERS
 from src.support import import_folder
-from src.tile import Tile, AnimatedTile, ExitTile
+from src.tile import Tile, AnimatedTile, ExitTile, Checkpoint
 from src.timer import Timer
 from src.transition import Transition
 from src.weapon import Weapon
@@ -86,7 +86,7 @@ class Level:
         # Interaction
         for obj in tmx_data.get_layer_by_name('Interaction'):
             if obj.name == 'Checkpoint':
-                Tile((obj.x, obj.y), [self.checkpoint_sprites])
+                Checkpoint(self.current_level, (obj.x, obj.y), [self.checkpoint_sprites])
 
         # Exit
         for obj in tmx_data.get_layer_by_name('Exit'):
@@ -137,6 +137,7 @@ class Level:
                         self.timers['player death'].activate()
 
     def reset_player(self):
+        self.load_map(self.last_checkpoint.level_name)
         x = self.last_checkpoint.rect.x
         y = self.last_checkpoint.rect.y
         self.player = Player((x, y), self.all_sprites, self.collision_sprites, self.create_attack,

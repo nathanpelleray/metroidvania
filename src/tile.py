@@ -66,3 +66,15 @@ class ExitTile(Tile):
 
         self.current_level = current_level
         self.new_level = new_level
+
+
+class Checkpoint(Tile):
+    def __init__(self, level_name: str,
+                 pos: tuple[int, int],
+                 groups: list[pygame.sprite.AbstractGroup],
+                 ):
+        # Setup
+        super().__init__(
+            pos=pos,
+            groups=groups)
+        self.level_name = level_name

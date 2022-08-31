@@ -21,10 +21,10 @@ TILE_COLOR = '#94D7F2'
 
 # Camera
 CAMERA_BORDERS = {
-    'left': 100,
-    'right': 200,
-    'top': 100,
-    'bottom': 150
+    'left': SCREEN_WIDTH // 2 - 50,
+    'right': SCREEN_WIDTH // 2 + 50,
+    'top': SCREEN_HEIGHT // 2 - 50,
+    'bottom': SCREEN_HEIGHT // 2 + 50
 }
 
 # Layer
