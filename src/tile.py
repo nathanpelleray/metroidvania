@@ -49,3 +49,20 @@ class AnimatedTile(Tile):
 
     def update(self, dt: float):
         self.animate(dt)
+
+
+class ExitTile(Tile):
+    def __init__(self, current_level: str, new_level: str,
+                 pos: tuple[int, int],
+                 width: int, height: int,
+                 groups: list[pygame.sprite.AbstractGroup],
+                 ):
+        # Setup
+        super().__init__(
+            pos=pos,
+            groups=groups)
+        self.image = pygame.Surface((width, height))
+        self.rect = self.image.get_rect(topleft=pos)
+
+        self.current_level = current_level
+        self.new_level = new_level

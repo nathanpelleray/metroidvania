@@ -4,11 +4,12 @@ from pytmx import load_pygame
 from src.UI import UI
 from src.camera import CameraGroup
 from src.enemy import Enemy
+from src.level_data import LEVELS
 from src.particule import ParticuleManager
 from src.player import Player
 from src.settings import TILE_SIZE, BG_COLOR, BASE_DIR, DEBUG, LAYERS
 from src.support import import_folder
-from src.tile import Tile, AnimatedTile
+from src.tile import Tile, AnimatedTile, ExitTile
 from src.timer import Timer
 from src.transition import Transition
 from src.weapon import Weapon
@@ -25,6 +26,7 @@ class Level:
         self.collider_sprites = pygame.sprite.Group()
         self.enemy_sprites = pygame.sprite.Group()
         self.checkpoint_sprites = pygame.sprite.Group()
+        self.exit_sprites = pygame.sprite.Group()
         self.last_checkpoint = None
         self.current_attack = None
 
@@ -38,11 +40,13 @@ class Level:
         self.screen_shake = False
 
         # Player
-        self.player = None
+        self.player = Player((128, 576), self.all_sprites, self.collision_sprites, self.create_attack,
+                             self.destroy_attack, self.create_particules)
         self.respawn = False
 
         # Map
-        self.setup()
+        self.current_level = 'map_test'
+        self.load_map(self.current_level)
 
         # User interface
         self.ui = UI()
@@ -53,8 +57,14 @@ class Level:
         # Transition
         self.transition = Transition(self.reset_player, self.stop_respawn)
 
-    def setup(self):
-        tmx_data = load_pygame('data/map_test.tmx')
+    def load_map(self, level_name, x: int = None, y: int = None):
+        self.clear_map()
+        tmx_data = load_pygame(f'data/{level_name}.tmx')
+        self.current_level = level_name
+
+        if x and y:
+            self.player.pos.x = x
+            self.player.pos.y = y
 
         # Terrain
         for x, y, surf in tmx_data.get_layer_by_name('Terrain').tiles():
@@ -73,13 +83,26 @@ class Level:
                 Enemy(obj.name, (obj.x, obj.y), [self.all_sprites, self.enemy_sprites], self.collider_sprites,
                       self.create_particules)
 
-        # Player
-        for obj in tmx_data.get_layer_by_name('Player'):
+        # Interaction
+        for obj in tmx_data.get_layer_by_name('Interaction'):
             if obj.name == 'Checkpoint':
                 Tile((obj.x, obj.y), [self.checkpoint_sprites])
-            if obj.name == 'Start':
-                self.player = Player((obj.x, obj.y), self.all_sprites, self.collision_sprites, self.create_attack,
-                                     self.destroy_attack, self.create_particules)
+
+        # Exit
+        for obj in tmx_data.get_layer_by_name('Exit'):
+            ExitTile(self.current_level, obj.name, (obj.x, obj.y), obj.width, obj.height,
+                     [self.all_sprites, self.exit_sprites])
+
+    def clear_map(self):
+        # Groups
+        self.all_sprites.empty()
+        self.collision_sprites.empty()
+        self.collider_sprites.empty()
+        self.enemy_sprites.empty()
+        self.checkpoint_sprites.empty()
+        self.exit_sprites.empty()
+        if self.current_attack:
+            self.current_attack.kill()
 
     def create_attack(self):
         self.current_attack = Weapon(self.player, [self.all_sprites])
@@ -131,6 +154,14 @@ class Level:
             for checkpoint in collision_sprites:  # type: Tile
                 self.last_checkpoint = checkpoint
 
+    def exit_collision(self):
+        collision_sprites = pygame.sprite.spritecollide(self.player, self.exit_sprites, False)
+        if collision_sprites:
+            for exit_sprite in collision_sprites:  # type: ExitTile
+                x = LEVELS[exit_sprite.new_level][exit_sprite.current_level][0]
+                y = LEVELS[exit_sprite.new_level][exit_sprite.current_level][1]
+                self.load_map(exit_sprite.new_level, x, y)
+
     def create_particules(self, animation_type: str, pos: tuple[int, int]):
         self.particule_manager.create_particules(animation_type, pos, self.all_sprites)
 
@@ -157,6 +188,7 @@ class Level:
         self.damage_player()
         self.player_attack_logic()
         self.checkpoint_collision()
+        self.exit_collision()
 
         if self.respawn:
             self.transition.play(dt)

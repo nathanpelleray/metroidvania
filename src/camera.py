@@ -61,3 +61,8 @@ class CameraGroup(pygame.sprite.Group):
         for sprite in self.sprites():
             if hasattr(sprite, 'draw_debug'):
                 sprite.draw_debug(self.display_surface, self.offset)
+
+    def empty(self):
+        for sprite in self.sprites():
+            if not hasattr(sprite, 'input'):
+                sprite.kill()
