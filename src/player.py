@@ -1,6 +1,5 @@
 import pygame
 
-from src.particule import ParticuleManager
 from src.settings import TARGET_FPS, BASE_DIR, LAYERS
 from src.support import import_folder, wave_value
 from src.tile import Tile
@@ -9,7 +8,8 @@ from src.timer import Timer
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos: tuple[int, int], group: pygame.sprite.Group,
-                 collision_sprites: pygame.sprite.Group, create_attack, destroy_attack, create_particules):
+                 collision_sprites: pygame.sprite.Group, create_attack, destroy_attack, create_particules,
+                 joysticks: list[pygame.joystick.Joystick]):
         super().__init__(group)
 
         # Animation
@@ -30,6 +30,7 @@ class Player(pygame.sprite.Sprite):
         self.image = self.animations[self.status][self.frame_index]
         self.rect = self.image.get_rect(topleft=pos)
         self.z = LAYERS['main']
+        self.joysticks = joysticks
 
         # Movement
         self.direction = pygame.math.Vector2()
@@ -84,45 +85,90 @@ class Player(pygame.sprite.Sprite):
         else:
             self.image.set_alpha(self.alpha)
 
+    def change_joysticks(self, joysticks: list[pygame.joystick.Joystick]):
+        self.joysticks = joysticks
+
     def input(self):
-        keys = pygame.key.get_pressed()
-
         if not self.timers['dash'].active and not self.timers['attacking'].active:
-            # Movement
-            if keys[pygame.K_RIGHT]:
-                self.direction.x = 1
-                self.status = 'right'
-            elif keys[pygame.K_LEFT]:
-                self.direction.x = -1
-                self.status = 'left'
+            if len(self.joysticks) == 0:
+                keys = pygame.key.get_pressed()
+
+                # Movement
+                if keys[pygame.K_RIGHT]:
+                    self.direction.x = 1
+                    self.status = 'right'
+                elif keys[pygame.K_LEFT]:
+                    self.direction.x = -1
+                    self.status = 'left'
+                else:
+                    self.direction.x = 0
+
+                # Attack
+                if keys[pygame.K_q] and self.can_attack:
+                    self.timers['attacking'].activate()
+                    self.speed_animation = 4 * 3
+                    self.frame_index = 0
+                    self.can_attack = False
+                    self.direction = pygame.math.Vector2()
+                    self.create_attack()
+
+                # Jump
+                if keys[pygame.K_SPACE] and (self.on_floor or self.can_double_jump):
+                    if self.on_floor:
+                        self.timers['double jump'].activate()
+                    self.can_double_jump = False
+                    self.direction.y = -self.jump_speed
+                    self.frame_index = 0
+                    self.create_particules('before_jump', self.rect.topleft)
+
+                # Dash
+                if keys[pygame.K_RCTRL] and self.can_dash:
+                    self.direction.y = 0
+                    self.can_dash = False
+                    self.timers['dash'].activate()
+                    self.vulnerable = False
+                    self.speed *= 4
+
             else:
-                self.direction.x = 0
+                axis = self.joysticks[0].get_axis(0)
+                if abs(axis) < 0.3:
+                    axis = 0
 
-            # Attack
-            if keys[pygame.K_q] and self.can_attack:
-                self.timers['attacking'].activate()
-                self.speed_animation = 4 * 3
-                self.frame_index = 0
-                self.can_attack = False
-                self.direction = pygame.math.Vector2()
-                self.create_attack()
+                # Movement
+                if axis > 0:
+                    self.direction.x = axis
+                    self.status = 'right'
+                elif axis < 0:
+                    self.direction.x = axis
+                    self.status = 'left'
+                else:
+                    self.direction.x = 0
 
-            # Jump
-            if keys[pygame.K_SPACE] and (self.on_floor or self.can_double_jump):
-                if self.on_floor:
-                    self.timers['double jump'].activate()
-                self.can_double_jump = False
-                self.direction.y = -self.jump_speed
-                self.frame_index = 0
-                self.create_particules('before_jump', self.rect.topleft)
+                # Attack
+                if self.joysticks[0].get_button(2) and self.can_attack:
+                    self.timers['attacking'].activate()
+                    self.speed_animation = 4 * 3
+                    self.frame_index = 0
+                    self.can_attack = False
+                    self.direction = pygame.math.Vector2()
+                    self.create_attack()
 
-            # Dash
-            if keys[pygame.K_RCTRL] and self.can_dash:
-                self.direction.y = 0
-                self.can_dash = False
-                self.timers['dash'].activate()
-                self.vulnerable = False
-                self.speed *= 4
+                # Jump
+                if self.joysticks[0].get_button(0) and (self.on_floor or self.can_double_jump):
+                    if self.on_floor:
+                        self.timers['double jump'].activate()
+                    self.can_double_jump = False
+                    self.direction.y = -self.jump_speed
+                    self.frame_index = 0
+                    self.create_particules('before_jump', self.rect.topleft)
+
+                # Dash
+                if self.joysticks[0].get_button(5) and self.can_dash:
+                    self.direction.y = 0
+                    self.can_dash = False
+                    self.timers['dash'].activate()
+                    self.vulnerable = False
+                    self.speed *= 4
 
     def get_status(self):
         # idle

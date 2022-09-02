@@ -16,9 +16,10 @@ from src.weapon import Weapon
 
 
 class Level:
-    def __init__(self):
+    def __init__(self, *joysticks: list[pygame.joystick.Joystick]):
         # Setup
         self.display_surface = pygame.display.get_surface()
+        self.joysticks = joysticks
 
         # Groups
         self.all_sprites = CameraGroup()
@@ -41,7 +42,7 @@ class Level:
 
         # Player
         self.player = Player((128, 576), self.all_sprites, self.collision_sprites, self.create_attack,
-                             self.destroy_attack, self.create_particules)
+                             self.destroy_attack, self.create_particules, self.joysticks)
         self.respawn = False
 
         # Map
@@ -93,6 +94,10 @@ class Level:
             ExitTile(self.current_level, obj.name, (obj.x, obj.y), obj.width, obj.height,
                      [self.all_sprites, self.exit_sprites])
 
+    def change_joysticks(self, joysticks: list[pygame.joystick.Joystick]):
+        self.joysticks = joysticks
+        self.player.change_joysticks(self.joysticks)
+
     def clear_map(self):
         # Groups
         self.all_sprites.empty()
@@ -141,7 +146,7 @@ class Level:
         x = self.last_checkpoint.rect.x
         y = self.last_checkpoint.rect.y
         self.player = Player((x, y), self.all_sprites, self.collision_sprites, self.create_attack,
-                             self.destroy_attack, self.create_particules)
+                             self.destroy_attack, self.create_particules, self.joysticks)
 
     def stop_respawn(self):
         self.respawn = False

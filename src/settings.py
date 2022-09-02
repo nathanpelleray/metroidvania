@@ -1,7 +1,7 @@
 from pathlib import Path
 
 # Utils
-FPS = 60
+FPS = 10000
 TARGET_FPS = 60
 DEBUG = False
 

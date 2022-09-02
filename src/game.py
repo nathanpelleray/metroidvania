@@ -17,7 +17,11 @@ class Game:
         pygame.display.set_caption('Platformer')
         self.clock = pygame.time.Clock()
 
-        self.level = Level()
+        # Joystick
+        pygame.joystick.init()
+        self.joysticks = [pygame.joystick.Joystick(i) for i in range(pygame.joystick.get_count())]
+
+        self.level = Level(self.joysticks)
 
     def run(self):
         while True:
@@ -27,8 +31,16 @@ class Game:
             # Event
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
+                    pygame.joystick.quit()
                     pygame.quit()
                     sys.exit()
+
+                if event.type == pygame.JOYDEVICEADDED:
+                    self.joysticks = [pygame.joystick.Joystick(i) for i in range(pygame.joystick.get_count())]
+                    self.level.change_joysticks(self.joysticks)
+                if event.type == pygame.JOYDEVICEREMOVED:
+                    self.joysticks = [pygame.joystick.Joystick(i) for i in range(pygame.joystick.get_count())]
+                    self.level.change_joysticks(self.joysticks)
 
             # Updates
             self.level.run(dt)
