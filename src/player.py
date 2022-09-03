@@ -151,7 +151,18 @@ class Player(pygame.sprite.Sprite):
                     self.frame_index = 0
                     self.can_attack = False
                     self.direction = pygame.math.Vector2()
-                    self.create_attack()
+
+                    if axis != 0:
+                        self.create_attack(self.status.split('_')[0])
+                    else:
+                        axis = self.joysticks[0].get_axis(1)
+                        if abs(axis) < 0.3:
+                            axis = 0
+
+                        if axis < 0:
+                            self.create_attack('top')
+                        elif axis > 0:
+                            self.create_attack('bottom')
 
                 # Jump
                 if self.joysticks[0].get_button(0) and (self.on_floor or self.can_double_jump):

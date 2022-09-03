@@ -109,8 +109,8 @@ class Level:
         if self.current_attack:
             self.current_attack.kill()
 
-    def create_attack(self):
-        self.current_attack = Weapon(self.player, [self.all_sprites])
+    def create_attack(self, direction: str):
+        self.current_attack = Weapon(self.player, direction, [self.all_sprites])
 
     def destroy_attack(self):
         if self.current_attack:

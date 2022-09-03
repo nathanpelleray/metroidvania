@@ -6,9 +6,9 @@ from src.support import import_folder
 
 
 class Weapon(pygame.sprite.Sprite):
-    def __init__(self, player: Player, groups: list[pygame.sprite.Group], z: int = LAYERS['main']):
+    def __init__(self, player: Player, direction: str, groups: list[pygame.sprite.Group], z: int = LAYERS['main']):
         super().__init__(groups)
-        direction = player.status.split('_')[0]
+        direction_player = player.status.split('_')[0]
 
         # Animation
         full_path = BASE_DIR / "graphics" / "player" / f"{direction}_sword_effect"
@@ -21,6 +21,10 @@ class Weapon(pygame.sprite.Sprite):
         self.z = z
         if direction == 'right':
             self.rect = self.image.get_rect(topleft=player.rect.topright)
+        elif direction == 'bottom':
+            self.rect = self.image.get_rect(topleft=player.rect.bottomleft)
+        elif direction == 'top':
+            self.rect = self.image.get_rect(bottomleft=player.rect.topleft)
         else:
             self.rect = self.image.get_rect(topright=player.rect.topleft)
 
