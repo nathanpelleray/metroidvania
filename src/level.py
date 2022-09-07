@@ -16,7 +16,7 @@ from src.weapon import Weapon
 
 
 class Level:
-    def __init__(self, *joysticks: list[pygame.joystick.Joystick]):
+    def __init__(self, joysticks: list[pygame.joystick.Joystick]):
         # Setup
         self.display_surface = pygame.display.get_surface()
         self.joysticks = joysticks
